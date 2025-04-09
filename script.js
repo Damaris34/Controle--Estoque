@@ -79,22 +79,4 @@ public class StockService {
             for (StockData stockData : stockList) {
                 table.addCell(new Phrase(stockData.getRegistrationDate(), rowFont));
                 table.addCell(new Phrase(stockData.getMaterialName(), rowFont));
-                table.addCell(new Phrase(String.valueOf(stockData.getQuantityUsed()), rowFont));
-                table.addCell(new Phrase(stockData.getMissingMaterial(), rowFont));
-                table.addCell(new Phrase(String.valueOf(stockData.getPurchaseQuantity()), rowFont));
-            }
-
-            document.add(table);
-
-        } catch (DocumentException e) {
-            e.printStackTrace();
-        } finally {
-            document.close();
-        }
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio_estoque.pdf");
-        headers.setContentType(org.springframework.http.MediaType.APPLICATION_PDF);
-        return ResponseEntity.ok().headers(headers).body(outputStream.toByteArray());
-    }
-}
+                table.addCel
