@@ -83,3 +83,12 @@ input {
 .notification.error {
     background-color: #dc3545;
 }
+
+#loading {
+    margin-top: 20px;
+    color: #555;
+}
+
+.hidden {
+    display: none;
+}
