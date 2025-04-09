@@ -9,6 +9,11 @@ document.getElementById('stockForm').addEventListener('submit', function(event) 
         purchaseQuantity: document.getElementById('purchaseQuantity').value
     };
 
+    if (!validateForm(formData)) {
+        showNotification('Por favor, preencha todos os campos corretamente.', 'error');
+        return;
+    }
+
     fetch('/api/stock/register', {
         method: 'POST',
         headers: {
@@ -18,10 +23,11 @@ document.getElementById('stockForm').addEventListener('submit', function(event) 
     })
     .then(response => response.text())
     .then(data => {
-        alert(data);
+        showNotification(data, 'success');
     })
     .catch(error => {
         console.error('Erro ao registrar estoque:', error);
+        showNotification('Erro ao registrar estoque.', 'error');
     });
 });
 
@@ -39,9 +45,23 @@ document.getElementById('exportPdf').addEventListener('click', function() {
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
-        alert('Exportação para PDF concluída!');
+        showNotification('Exportação para PDF concluída!', 'success');
     })
     .catch(error => {
         console.error('Erro ao exportar para PDF:', error);
+        showNotification('Erro ao exportar para PDF.', 'error');
     });
 });
+
+function validateForm(formData) {
+    return formData.registrationDate && formData.materialName && formData.quantityUsed !== undefined;
+}
+
+function showNotification(message, type) {
+    const notificationDiv = document.getElementById('notifications');
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerText = message;
+    notificationDiv.appendChild(notification);
+    setTimeout(() => notificationDiv.removeChild(notification), 3000);
+}
