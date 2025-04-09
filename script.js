@@ -23,7 +23,7 @@ public class StockService {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Document document = new Document(PageSize.A4);
         try {
-            PdfWriter.getInstance(document, outputStream);
+            PdfWriter writer = PdfWriter.getInstance(document, outputStream);
             document.open();
 
             // Adicionar metadados
@@ -31,16 +31,19 @@ public class StockService {
             document.addAuthor("Sistema de Controle de Estoque");
 
             // Adicionar título
-            Paragraph title = new Paragraph("Relatório de Estoque", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+            Paragraph title = new Paragraph("Relatório de Estoque", new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD));
             title.setAlignment(Element.ALIGN_CENTER);
+            title.setSpacingAfter(20f);
             document.add(title);
-            document.add(new Paragraph(" "));
 
             // Criar tabela
             PdfPTable table = new PdfPTable(5);
             table.setWidthPercentage(100);
-            table.setSpacingBefore(10f);
-            table.setSpacingAfter(10f);
+            table.setSpacingBefore(20f);
+
+            // Definir larguras relativas das colunas
+            float[] columnWidths = {1.5f, 3f, 1.5f, 2f, 1.5f};
+            table.setWidths(columnWidths);
 
             // Adicionar cabeçalho da tabela
             Font headerFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
@@ -48,31 +51,37 @@ public class StockService {
 
             cell = new PdfPCell(new Phrase("Data de Registro", headerFont));
             cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+            cell.setPadding(8f);
             table.addCell(cell);
 
             cell = new PdfPCell(new Phrase("Nome do Material", headerFont));
             cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+            cell.setPadding(8f);
             table.addCell(cell);
 
             cell = new PdfPCell(new Phrase("Quantidade Utilizada", headerFont));
             cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+            cell.setPadding(8f);
             table.addCell(cell);
 
             cell = new PdfPCell(new Phrase("Material em Falta", headerFont));
             cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+            cell.setPadding(8f);
             table.addCell(cell);
 
             cell = new PdfPCell(new Phrase("Quantidade para Compra", headerFont));
             cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+            cell.setPadding(8f);
             table.addCell(cell);
 
             // Adicionar dados à tabela
+            Font rowFont = new Font(Font.FontFamily.HELVETICA, 11, Font.NORMAL);
             for (StockData stockData : stockList) {
-                table.addCell(stockData.getRegistrationDate());
-                table.addCell(stockData.getMaterialName());
-                table.addCell(String.valueOf(stockData.getQuantityUsed()));
-                table.addCell(stockData.getMissingMaterial());
-                table.addCell(String.valueOf(stockData.getPurchaseQuantity()));
+                table.addCell(new Phrase(stockData.getRegistrationDate(), rowFont));
+                table.addCell(new Phrase(stockData.getMaterialName(), rowFont));
+                table.addCell(new Phrase(String.valueOf(stockData.getQuantityUsed()), rowFont));
+                table.addCell(new Phrase(stockData.getMissingMaterial(), rowFont));
+                table.addCell(new Phrase(String.valueOf(stockData.getPurchaseQuantity()), rowFont));
             }
 
             document.add(table);
@@ -85,6 +94,7 @@ public class StockService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio_estoque.pdf");
+        headers.setContentType(org.springframework.http.MediaType.APPLICATION_PDF);
         return ResponseEntity.ok().headers(headers).body(outputStream.toByteArray());
     }
 }
