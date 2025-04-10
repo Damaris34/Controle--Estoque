@@ -15,7 +15,7 @@ body {
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 90%;
-    max-width: 600px;
+    max-width: 1200px;
     box-sizing: border-box;
 }
 
@@ -27,6 +27,16 @@ header {
 h1 {
     color: #333;
     font-size: 24px;
+}
+
+.main-content {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.form-section, .info-section {
+    flex: 1;
 }
 
 .form-section {
@@ -108,4 +118,18 @@ input {
 
 .hidden {
     display: none;
+}
+
+.info-section h2 {
+    color: #333;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+#info-content {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    min-height: 200px;
 }
