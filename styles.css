@@ -1,6 +1,6 @@
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f0f2f5;
+    background-color: #f4f4f9;
     margin: 0;
     padding: 0;
     display: flex;
@@ -11,11 +11,12 @@ body {
 
 .container {
     background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 90%;
     max-width: 600px;
+    box-sizing: border-box;
 }
 
 header {
@@ -25,6 +26,7 @@ header {
 
 h1 {
     color: #333;
+    font-size: 24px;
 }
 
 .form-section {
@@ -40,29 +42,42 @@ label {
     display: block;
     margin-bottom: 5px;
     color: #555;
+    font-weight: bold;
 }
 
 input {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 5px;
     box-sizing: border-box;
+    font-size: 16px;
 }
 
 .btn {
     padding: 10px 15px;
     border: none;
-    border-radius: 4px;
-    background-color: #28a745;
+    border-radius: 5px;
     color: #fff;
     cursor: pointer;
-    margin-top: 10px;
+    font-size: 16px;
     transition: background-color 0.3s;
 }
 
-.btn:hover {
-    background-color: #218838;
+.btn.primary {
+    background-color: #007bff;
+}
+
+.btn.primary:hover {
+    background-color: #0056b3;
+}
+
+.btn.secondary {
+    background-color: #6c757d;
+}
+
+.btn.secondary:hover {
+    background-color: #5a6268;
 }
 
 .notifications {
@@ -71,9 +86,10 @@ input {
 
 .notification {
     padding: 10px;
-    border-radius: 4px;
+    border-radius: 5px;
     margin-bottom: 10px;
     color: #fff;
+    font-size: 14px;
 }
 
 .notification.success {
@@ -87,6 +103,7 @@ input {
 #loading {
     margin-top: 20px;
     color: #555;
+    font-size: 14px;
 }
 
 .hidden {
