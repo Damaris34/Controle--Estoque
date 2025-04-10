@@ -33,6 +33,7 @@ document.getElementById('stockForm').addEventListener('submit', function(event) 
 
 document.getElementById('exportPdf').addEventListener('click', function() {
     document.getElementById('loading').classList.remove('hidden');
+    document.getElementById('error-message').classList.add('hidden');
 
     fetch('/api/stock/exportPdf', {
         method: 'GET'
@@ -56,7 +57,7 @@ document.getElementById('exportPdf').addEventListener('click', function() {
     })
     .catch(error => {
         console.error('Erro ao exportar para PDF:', error);
-        showNotification('Erro ao exportar para PDF.', 'error');
+        document.getElementById('error-message').classList.remove('hidden');
     })
     .finally(() => {
         document.getElementById('loading').classList.add('hidden');
