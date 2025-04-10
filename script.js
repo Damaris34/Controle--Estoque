@@ -100,4 +100,3 @@ public class StockService {
         return ResponseEntity.ok().headers(headers).body(outputStream.toByteArray());
     }
 }
-
