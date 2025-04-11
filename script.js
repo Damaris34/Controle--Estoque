@@ -1,57 +1,78 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Estoque</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Controle de Estoque</h1>
-        </header>
-        <main class="main-content">
-            <section class="form-section">
-                <form id="stockForm">
-                    <div class="form-group">
-                        <label for="registrationDate">Data de Registro:</label>
-                        <input type="date" id="registrationDate" name="registrationDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="materialName">Nome do Material:</label>
-                        <input type="text" id="materialName" name="materialName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="quantityUsed">Quantidade Utilizada:</label>
-                        <input type="number" id="quantityUsed" name="quantityUsed" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="missingMaterial">Material em Falta:</label>
-                        <input type="text" id="missingMaterial" name="missingMaterial">
-                    </div>
-                    <div class="form-group">
-                        <label for="purchaseQuantity">Quantidade para Compra:</label>
-                        <input type="number" id="purchaseQuantity" name="purchaseQuantity">
-                    </div>
-                    <button type="submit" class="btn primary">Registrar</button>
-                </form>
-                <button id="exportPdf" class="btn secondary">Exportar para PDF</button>
-                <div id="loading" class="hidden">Gerando PDF...</div>
-                <div id="error-message" class="hidden notification error">Erro ao exportar PDF.</div>
-            </section>
-            <section class="info-section">
-                <h2>Informações</h2>
-                <div id="info-content">
-                    <!-- Informações ou resultados serão exibidos aqui -->
-                    <p>Aqui serão exibidas as informações ou resultados, como o PDF gerado.</p>
-                </div>
-            </section>
-        </main>
-        <section class="notifications" id="notifications">
-            <!-- Notifications will appear here -->
-        </section>
-    </div>
-    <script src="script.js"></script>
-</body>
-</html>
+document.getElementById('stockForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const formData = {
+        registrationDate: document.getElementById('registrationDate').value,
+        materialName: document.getElementById('materialName').value,
+        quantityUsed: document.getElementById('quantityUsed').value,
+        missingMaterial: document.getElementById('missingMaterial').value,
+        purchaseQuantity: document.getElementById('purchaseQuantity').value
+    };
+
+    if (!validateForm(formData)) {
+        showNotification('Por favor, preencha todos os campos corretamente.', 'error');
+        return;
+    }
+
+    fetch('/api/stock/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.text())
+    .then(data => {
+        showNotification(data, 'success');
+    })
+    .catch(error => {
+        console.error('Erro ao registrar estoque:', error);
+        showNotification('Erro ao registrar estoque.', 'error');
+    });
+});
+
+document.getElementById('exportPdf').addEventListener('click', function() {
+    document.getElementById('loading').classList.remove('hidden');
+    document.getElementById('error-message').classList.add('hidden');
+
+    fetch('/api/stock/exportPdf', {
+        method: 'GET'
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.blob();
+        }
+        throw new Error('Erro ao exportar PDF.');
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'relatorio_estoque.pdf';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        showNotification('Exportação para PDF concluída!', 'success');
+    })
+    .catch(error => {
+        console.error('Erro ao exportar para PDF:', error);
+        document.getElementById('error-message').classList.remove('hidden');
+    })
+    .finally(() => {
+        document.getElementById('loading').classList.add('hidden');
+    });
+});
+
+function validateForm(formData) {
+    return formData.registrationDate && formData.materialName && formData.quantityUsed !== undefined;
+}
+
+function showNotification(message, type) {
+    const notificationDiv = document.getElementById('notifications');
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerText = message;
+    notificationDiv.appendChild(notification);
+    setTimeout(() => notificationDiv.removeChild(notification), 3000);
+}
