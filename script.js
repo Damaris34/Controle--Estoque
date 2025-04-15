@@ -1,107 +1,129 @@
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+let registros = [];
 
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
+function registrarUso() {
+    const dataRegistroUso = document.getElementById('dataRegistroUso').value;
+    const materialUtilizado = document.getElementById('materialUtilizado').value;
+    const quantidadeUtilizada = document.getElementById('quantidadeUtilizada').value;
 
-@Service
-public class StockService {
+    registros.push({
+        data: dataRegistroUso,
+        material: materialUtilizado,
+        quantidade: quantidadeUtilizada,
+        tipo: 'Uso'
+    });
 
-    private List<StockData> stockList = new ArrayList<>();
+    atualizarTabela();
+    limparFormulario();
+}
 
-    public void registerStock(StockData stockData) {
-        stockList.add(stockData);
-    }
+function registrarEntrada() {
+    const dataRegistroEntrada = document.getElementById('dataRegistroEntrada').value;
+    const materialEmFalta = document.getElementById('materialEmFalta').value;
+    const quantidadeEntrada = document.getElementById('quantidadeEntrada').value;
 
-    public ResponseEntity<byte[]> exportPdf() {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        Document document = new Document(PageSize.A4);
-        try {
-            PdfWriter writer = PdfWriter.getInstance(document, outputStream);
-            document.open();
+    registros.push({
+        data: dataRegistroEntrada,
+        material: materialEmFalta,
+        quantidade: quantidadeEntrada,
+        tipo: 'Entrada'
+    });
 
-            // Adicionar metadados
-            document.addTitle("Relatório de Estoque");
-            document.addAuthor("Sistema de Controle de Estoque");
+    atualizarTabela();
+    limparFormulario();
+}
 
-            // Adicionar título
-            Paragraph title = new Paragraph("Relatório de Estoque", new Font(Font.FontFamily.HELVETICA, 24, Font.BOLD, BaseColor.BLUE));
-            title.setAlignment(Element.ALIGN_CENTER);
-            title.setSpacingAfter(20f);
-            document.add(title);
+function atualizarTabela() {
+    const tbody = document.querySelector('#registrosTable tbody');
+    tbody.innerHTML = '';
 
-            // Criar tabela
-            PdfPTable table = new PdfPTable(5);
-            table.setWidthPercentage(100);
-            table.setSpacingBefore(20f);
+    registros.forEach(registro => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${registro.data}</td>
+            <td>${registro.material}</td>
+            <td>${registro.quantidade}</td>
+            <td>${registro.tipo}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
 
-            // Definir larguras relativas das colunas
-            float[] columnWidths = {1.5f, 3f, 1.5f, 2f, 1.5f};
-            table.setWidths(columnWidths);
+function limparFormulario() {
+    document.getElementById('estoqueForm').reset();
+}
 
-            // Adicionar cabeçalho da tabela
-            Font headerFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.WHITE);
-            PdfPCell cell;
+function gerarPDF() {
+    const { jsPDF } = window.jspdf;
 
-            cell = new PdfPCell(new Phrase("Data de Registro", headerFont));
-            cell.setBackgroundColor(BaseColor.GRAY);
-            cell.setPadding(8f);
-            table.addCell(cell);
+    const doc = new jsPDF();
 
-            cell = new PdfPCell(new Phrase("Nome do Material", headerFont));
-            cell.setBackgroundColor(BaseColor.GRAY);
-            cell.setPadding(8f);
-            table.addCell(cell);
+    // Adicionar cabeçalho
+    doc.setFontSize(18);
+    doc.text('Controle de Estoque', 20, 20);
+    doc.setFontSize(12);
+    doc.text('Data de Geração: ' + new Date().toLocaleDateString(), 20, 30);
 
-            cell = new PdfPCell(new Phrase("Quantidade Utilizada", headerFont));
-            cell.setBackgroundColor(BaseColor.GRAY);
-            cell.setPadding(8f);
-            table.addCell(cell);
+    // Configurações da tabela
+    const headers = [['Data de Registro', 'Material', 'Quantidade', 'Tipo']];
+    const data = registros.map(registro => [
+        registro.data,
+        registro.material,
+        registro.quantidade,
+        registro.tipo
+    ]);
 
-            cell = new PdfPCell(new Phrase("Material em Falta", headerFont));
-            cell.setBackgroundColor(BaseColor.GRAY);
-            cell.setPadding(8f);
-            table.addCell(cell);
-
-            cell = new PdfPCell(new Phrase("Quantidade para Compra", headerFont));
-            cell.setBackgroundColor(BaseColor.GRAY);
-            cell.setPadding(8f);
-            table.addCell(cell);
-
-            // Adicionar dados à tabela
-            Font rowFont = new Font(Font.FontFamily.HELVETICA, 11, Font.NORMAL, BaseColor.BLACK);
-            if (stockList.isEmpty()) {
-                document.add(new Paragraph("Nenhum dado disponível para exportação.", rowFont));
-            } else {
-                for (StockData stockData : stockList) {
-                    table.addCell(new Phrase(stockData.getRegistrationDate(), rowFont));
-                    table.addCell(new Phrase(stockData.getMaterialName(), rowFont));
-                    table.addCell(new Phrase(String.valueOf(stockData.getQuantityUsed()), rowFont));
-                    table.addCell(new Phrase(stockData.getMissingMaterial(), rowFont));
-                    table.addCell(new Phrase(String.valueOf(stockData.getPurchaseQuantity()), rowFont));
-                }
-                document.add(table);
-            }
-
-            System.out.println("PDF gerado com sucesso.");
-
-        } catch (DocumentException e) {
-            e.printStackTrace();
-            System.err.println("Erro ao gerar PDF: " + e.getMessage());
-            return ResponseEntity.status(500).body(null);
-        } finally {
-            document.close();
+    // Adicionar tabela ao PDF
+    doc.autoTable({
+        startY: 40,
+        head: headers,
+        body: data,
+        theme: 'striped',
+        styles: {
+            fontSize: 12,
+            cellPadding: 5,
+            overflow: 'linebreak',
+            halign: 'center',
+            valign: 'middle'
+        },
+        headStyles: {
+            fillColor: [40, 167, 69],
+            textColor: 255,
+            fontSize: 14
+        },
+        bodyStyles: {
+            fillColor: [255, 255, 255],
+            textColor: 0
+        },
+        alternateRowStyles: {
+            fillColor: [240, 240, 240]
+        },
+        didDrawPage: function (data) {
+            // Adicionar rodapé
+            doc.setFontSize(10);
+            doc.text('Página ' + doc.internal.getNumberOfPages(), data.settings.margin.left, doc.internal.pageSize.height - 10);
         }
+    });
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=relatorio_estoque.pdf");
-        headers.setContentType(org.springframework.http.MediaType.APPLICATION_PDF);
-        return ResponseEntity.ok().headers(headers).body(outputStream.toByteArray());
+    // Adicionar rodapé em todas as páginas
+    const totalPagesExp = '{total_pages_count_string}';
+    doc.autoTable({
+        startY: doc.autoTable.previous.finalY + 10,
+        body: [
+            [{ content: 'Relatório gerado automaticamente', colSpan: 4, styles: { halign: 'center', fillColor: [220, 220, 220] } }],
+            [{ content: 'Total de Registros: ' + registros.length, colSpan: 4, styles: { halign: 'center' } }]
+        ],
+        theme: 'plain',
+        didDrawPage: function (data) {
+            // Rodapé
+            doc.setFontSize(10);
+            doc.text('Página ' + doc.internal.getNumberOfPages(), data.settings.margin.left, doc.internal.pageSize.height - 10);
+        }
+    });
+
+    if (typeof doc.putTotalPages === 'function') {
+        doc.putTotalPages(totalPagesExp);
     }
+
+    // Salvar o PDF
+    doc.save('controle_de_estoque.pdf');
 }
