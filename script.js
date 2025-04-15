@@ -13,7 +13,7 @@ function registrarUso() {
     });
 
     atualizarTabela();
-    limparFormulario();
+    limparFormulario('usoForm');
 }
 
 function registrarEntrada() {
@@ -29,7 +29,7 @@ function registrarEntrada() {
     });
 
     atualizarTabela();
-    limparFormulario();
+    limparFormulario('entradaForm');
 }
 
 function atualizarTabela() {
@@ -48,8 +48,8 @@ function atualizarTabela() {
     });
 }
 
-function limparFormulario() {
-    document.getElementById('estoqueForm').reset();
+function limparFormulario(formId) {
+    document.getElementById(formId).reset();
 }
 
 function gerarPDF() {
