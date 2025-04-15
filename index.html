@@ -1,5 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-    <!-- Outras tags head -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Estoque</title>
+    <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.24/jspdf.plugin.autotable.min.js"></script>
 </head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Controle de Estoque</h1>
+        </header>
+        <main>
+            <section id="registro-uso">
+                <h2>Registrar Uso de Material</h2>
+                <form id="usoForm">
+                    <label for="dataRegistroUso">Data de Registro:</label>
+                    <input type="date" id="dataRegistroUso" name="dataRegistroUso" required>
+
+                    <label for="materialUtilizado">Material Utilizado:</label>
+                    <input type="text" id="materialUtilizado" name="materialUtilizado" required>
+
+                    <label for="quantidadeUtilizada">Quantidade Utilizada:</label>
+                    <input type="number" id="quantidadeUtilizada" name="quantidadeUtilizada" required>
+
+                    <button type="button" onclick="registrarUso()">Registrar Uso</button>
+                </form>
+            </section>
+
+            <section id="registro-entrada">
+                <h2>Registrar Entrada de Material</h2>
+                <form id="entradaForm">
+                    <label for="dataRegistroEntrada">Data de Registro da Entrada:</label>
+                    <input type="date" id="dataRegistroEntrada" name="dataRegistroEntrada" required>
+
+                    <label for="materialEmFalta">Material em Falta:</label>
+                    <input type="text" id="materialEmFalta" name="materialEmFalta" required>
+
+                    <label for="quantidadeEntrada">Quantidade:</label>
+                    <input type="number" id="quantidadeEntrada" name="quantidadeEntrada" required>
+
+                    <button type="button" onclick="registrarEntrada()">Registrar Entrada</button>
+                </form>
+            </section>
+
+            <section id="registros">
+                <h2>Registros</h2>
+                <table id="registrosTable">
+                    <thead>
+                        <tr>
+                            <th>Data de Registro</th>
+                            <th>Material</th>
+                            <th>Quantidade</th>
+                            <th>Tipo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Registros serão inseridos aqui -->
+                    </tbody>
+                </table>
+            </section>
+
+            <button onclick="gerarPDF()">Gerar PDF</button>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
